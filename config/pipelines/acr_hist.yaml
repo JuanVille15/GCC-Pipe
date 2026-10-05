@@ -1,0 +1,9 @@
+source:
+  type: excel
+  path: ${ACR_HIST_ORIGIN}
+  sub_paths: ['Activos','Inactivos']
+
+target:
+  schema: GRC
+  table: GCC_HIST_ACR
+  mode: append
