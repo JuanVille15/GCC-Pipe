@@ -8,3 +8,6 @@ class EmptyConfigError(Exception):
 
 class MissingEnvVarError(Exception):
     pass
+
+class ExtractError(Exception):
+    pass
