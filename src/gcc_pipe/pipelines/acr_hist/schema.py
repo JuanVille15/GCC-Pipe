@@ -2,6 +2,7 @@
 
 import pandera.pandas as pa
 from pandera.typing import Series
+from gcc_pipe.core.schemas import LineageSchema
 
 # --- Valores fijos --- #
 
@@ -11,7 +12,7 @@ VALIDACION_FECHA = r"^\d{2}/\d{2}/\d{4}$"
 
 # --- Esquema de entrada --- #
 
-class AcrRawSchema(pa.DataFrameModel):
+class AcrRawSchema(LineageSchema):
     '''Contrato de Entrada: El excel tal como llega: Todo TEXTO'''
             
     tipo_documento: Series[str] = pa.Field(
