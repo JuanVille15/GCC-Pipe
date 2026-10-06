@@ -6,9 +6,12 @@ from typing import Any, Mapping
 from pathlib import Path
 from gcc_pipe.utils.exceptions import EmptyConfigError, LoadConfigError, MissingEnvVarError
 
-
+# --- Rutas generales importables --- #
 ROOT = Path(__file__).parents[2]
 CONFIG_PATH = ROOT / "config"
+DATA_PATH = ROOT / "data"
+
+# --- Patron variables de entorno --- #
 ENV_VAR_PATTERN = re.compile(r"\$\{([A-Za-z_][A-Za-z0-9_]*)\}")
 
 def _expand_env_vars(
