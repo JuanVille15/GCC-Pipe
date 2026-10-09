@@ -1,7 +1,9 @@
 source:
   type: excel
   path: ${ACR_HIST_ORIGIN}
-  sub_paths: ['Activos','Inactivos']
+  sub_paths: 
+    month: ['Activos','Inactivos']
+    hist: ['Activos/Historico', 'Inactivos/Historico']
 
 target:
   schema: GRC
