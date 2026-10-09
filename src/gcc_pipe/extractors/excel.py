@@ -130,7 +130,7 @@ class ExcelExtractor:
         for s in source_files:
             df = read_excel_file(s.path, self.sheet, self.header)
             df = add_lineage(df, s, extracted_at=extracted_at)
+            df.columns = df.columns.str.strip() # Habian espacio en los archivos de entrada: inicio y final
             frames.append(df)
 
         return pd.concat(frames, axis=0, ignore_index=True)
-
