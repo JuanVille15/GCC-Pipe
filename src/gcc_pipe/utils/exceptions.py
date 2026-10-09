@@ -11,3 +11,6 @@ class MissingEnvVarError(Exception):
 
 class ExtractError(Exception):
     pass
+
+class PersistFileError(Exception):
+    pass
