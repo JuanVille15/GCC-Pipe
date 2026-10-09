@@ -8,7 +8,7 @@ from gcc_pipe.core.schemas import LineageSchema
 
 CATALOGO_ID = ['CC','CE','NIT','RC','PA','TI','NUI']
 VALIDACION_NUMEROS = r"^-?\d+(\.\d+)?$"
-VALIDACION_FECHA = r"^\d{2}/\d{2}/\d{4}$"
+VALIDACION_FECHA = r"^\d{4}-\d{2}-\d{2} 00:00:00$"
 
 # --- Esquema de entrada --- #
 
@@ -54,12 +54,20 @@ class AcrRawSchema(LineageSchema):
         str_matches=VALIDACION_NUMEROS
     )
     
+    Total_Pagado_Coomeva: Series[str] = pa.Field(
+        alias='Total_Pagado_Coomeva',
+        nullable=True,
+        str_length={"max_value": 15}, 
+        str_matches=VALIDACION_NUMEROS,
+    )
+    
     tipo_alternativa: Series[str] = pa.Field(
         alias='Tipo_Alternativa', 
         nullable=False, 
-        str_length={"max_value": 20}
+        str_length={"max_value": 50}
     )
     
     class Config:
         strict = True
-        unique = ['Cedula', 'Fecha_Aplicacion']
+        unique = [['Fecha_Aplicacion' , 'Tipo_Documento', 
+                  'Cedula', 'Tipo_Alternativa']]
