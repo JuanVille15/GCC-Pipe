@@ -7,5 +7,5 @@ source:
 
 target:
   schema: GRC
-  table: GCC_HIST_ACR
+  table: GCC_HIST_ALTERNATIVAS
   mode: append
