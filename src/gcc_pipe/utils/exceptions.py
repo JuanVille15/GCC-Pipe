@@ -17,3 +17,6 @@ class PersistFileError(Exception):
 
 class TransformError(Exception):
     pass
+
+class QueryError(Exception):
+    pass
