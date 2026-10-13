@@ -10,6 +10,7 @@ from gcc_pipe.utils.exceptions import EmptyConfigError, LoadConfigError, Missing
 ROOT = Path(__file__).parents[2]
 CONFIG_PATH = ROOT / "config"
 DATA_PATH = ROOT / "data"
+SQL_QUERY_PATH = ROOT / "sql" / "querys"
 
 # --- Patron variables de entorno --- #
 ENV_VAR_PATTERN = re.compile(r"\$\{([A-Za-z_][A-Za-z0-9_]*)\}")
