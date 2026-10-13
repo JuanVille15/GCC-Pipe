@@ -47,7 +47,6 @@ def _expand_env_vars(
     else:
         return valor
         
-
 def load_pipeline_config(
     process: str, 
     env: Mapping[str,str],
@@ -79,10 +78,33 @@ def load_pipeline_config(
     
     return cfg
 
+def get_db_settings(env:Mapping[str,str]) -> dict[str,str]:
+    
+    env_exist = load_dotenv()
+    
+    if not env_exist:
+        raise FileNotFoundError('No existe .env en la raiz del proyecto...')
+    
+    VALORES = {
+        'KIND':'oracle', 
+        'USER':os.getenv('USER_GCC'),
+        'PASSWORD':os.getenv('PASSWORD_GCC'),
+        'SERVER':os.getenv('SERVER_GCC'), 
+        'SERVICE':os.getenv('SERVICE_GCC'),
+        'PORT':os.getenv('PORT_GCC'), 
+    }
+
+    FALTANTES = [k for k,v in VALORES.items() if v is None]
+    if FALTANTES:
+        raise KeyError(f'Faltan variables en .env: {FALTANTES}')
+
+    return VALORES
+
+
 if __name__ == '__main__':
     import os
     from dotenv import load_dotenv
     
     load_dotenv()
     env = os.environ
-    cfg = load_pipeline_config(process='acr_hist', env=env,)
+    cfg = get_db_settings(env)
