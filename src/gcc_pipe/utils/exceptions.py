@@ -14,3 +14,6 @@ class ExtractError(Exception):
 
 class PersistFileError(Exception):
     pass
+
+class TransformError(Exception):
+    pass
