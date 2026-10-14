@@ -4,7 +4,7 @@ import re
 
 from typing import Any, Mapping
 from pathlib import Path
-from gcc_pipe.utils.exceptions import EmptyConfigError, LoadConfigError, MissingEnvVarError
+from gcc_pipe.core.exceptions import EmptyConfigError, LoadConfigError, MissingEnvVarError
 
 # --- Rutas generales importables --- #
 ROOT = Path(__file__).parents[2]
@@ -81,23 +81,18 @@ def load_pipeline_config(
 
 def get_db_settings(env:Mapping[str,str]) -> dict[str,str]:
     
-    env_exist = load_dotenv()
-    
-    if not env_exist:
-        raise FileNotFoundError('No existe .env en la raiz del proyecto...')
-    
     VALORES = {
         'KIND':'oracle', 
-        'USER':os.getenv('USER_GCC'),
-        'PASSWORD':os.getenv('PASSWORD_GCC'),
-        'SERVER':os.getenv('SERVER_GCC'), 
-        'SERVICE':os.getenv('SERVICE_GCC'),
-        'PORT':os.getenv('PORT_GCC'), 
+        'USER_GCC':env.get('USER_GCC'),
+        'PASSWORD_GCC':env.get('PASSWORD_GCC'),
+        'SERVER_GCC':env.get('SERVER_GCC'), 
+        'SERVICE_GCC':env.get('SERVICE_GCC'),
+        'PORT_GCC':env.get('PORT_GCC'), 
     }
 
     FALTANTES = [k for k,v in VALORES.items() if v is None]
     if FALTANTES:
-        raise KeyError(f'Faltan variables en .env: {FALTANTES}')
+        raise MissingEnvVarError(f'Faltan variables en .env: {FALTANTES}')
 
     return VALORES
 

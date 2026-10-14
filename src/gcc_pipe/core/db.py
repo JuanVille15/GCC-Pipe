@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 
-from gcc_pipe.utils.exceptions import QueryError
+from gcc_pipe.core.exceptions import QueryError
 from sqlalchemy import Engine, create_engine, Connection, text, bindparam
 from sqlalchemy.engine import URL
 from gcc_pipe.config import get_db_settings
@@ -11,11 +11,11 @@ def build_gcc_con(config:dict[str,str]) -> Engine:
     
     c_url = URL.create(
             "oracle+oracledb",
-            username=config['USER'],
-            password=config['PASSWORD'],
-            host=config['SERVER'],
-            port=int(config['PORT']),
-            query={"service_name": config['SERVICE']},
+            username=config['USER_GCC'],
+            password=config['PASSWORD_GCC'],
+            host=config['SERVER_GCC'],
+            port=int(config['PORT_GCC']),
+            query={"service_name": config['SERVICE_GCC']},
         )
 
     con_gcc = create_engine(url=c_url)

@@ -5,7 +5,7 @@ import numpy as np
 from dataclasses import dataclass
 from unidecode import unidecode
 from datetime import date
-from gcc_pipe.utils.exceptions import TransformError
+from gcc_pipe.core.exceptions import TransformError
 
 
 COL_NAMES = {
@@ -44,6 +44,7 @@ COLUMNAS_FINALES = [
     'APLICADO_RECREACION', 'TOTAL_PAGADO_COOMEVA', 'PROCESO_ORIGEN',
     'ALTERNATIVA', 'INDICADOR_CRUZE_INAC_ACT',
 ]
+
 
 @dataclass(frozen=True)
 class ResultadoTransform:
@@ -236,7 +237,8 @@ def _separar(
     # --- Se separan los dataframes --- #
     es_valido = df['_motivo_cuarentena'].isna()
     
-    validos = df.loc[es_valido, COLUMNAS_FINALES]
+    otras.remove('_motivo_cuarentena')
+    validos = df.loc[es_valido, COLUMNAS_FINALES + otras]
     cuarentena = df[~es_valido][col_order]
     
     return ResultadoTransform(validos=validos, cuarentena=cuarentena)

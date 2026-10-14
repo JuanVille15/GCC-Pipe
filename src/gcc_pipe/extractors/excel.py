@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
-from gcc_pipe.utils.exceptions import ExtractError
+from gcc_pipe.core.exceptions import ExtractError
 
 import pandas as pd
 

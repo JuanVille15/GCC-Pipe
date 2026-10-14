@@ -76,7 +76,7 @@ class AcrRawSchema(LineageSchema):
         
 # --- Esquema de salida --- #
 
-class AcrTargetSchema(pa.DataFrameModel):
+class AcrTargetSchema(LineageSchema):
     '''Contrato de salida -- carga'''
     
     periodo: Series[int] = pa.Field(
@@ -151,6 +151,10 @@ class AcrTargetSchema(pa.DataFrameModel):
         alias='INDICADOR_CRUZE_INAC_ACT',
         nullable=False,
         isin=[0, 1]
+    )
+    
+    tipo_documento_raw: Series[str] = pa.Field(
+        alias='_tipo_documento_raw'
     )
     
     

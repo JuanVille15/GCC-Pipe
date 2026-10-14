@@ -5,13 +5,9 @@ from gcc_pipe.config import SQL_QUERY_PATH
 from gcc_pipe.core.db import read_batch
 
 def consulta_tipo_documento(
-    df:pd.DataFrame, 
+    lista:list[int], 
     engine:Engine,
-    key:str,
 ) -> pd.DataFrame:
-    
-    # --- Documentos unicos --- #
-    unicos = df[key].unique().tolist()
     
     # --- Resolver la ruta al query --- #
     query_path = SQL_QUERY_PATH / "tipo_documento.sql"
@@ -22,6 +18,6 @@ def consulta_tipo_documento(
     
     # --- Se consulta x lotes --- #
     with engine.connect() as con:
-        tipos = read_batch(query=query, con=con, valores=unicos,)
+        tipos = read_batch(query=query, con=con, valores=lista,)
     
     return tipos

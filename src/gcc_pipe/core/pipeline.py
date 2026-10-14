@@ -10,3 +10,4 @@ class Pipeline:
     name:str
     extractor:Extractor
     raw_schema: type[pa.DataFrameModel]
+    target_schema: type[pa.DataFrameModel]

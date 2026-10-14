@@ -5,7 +5,7 @@ from datetime import date
 from pathlib import Path
 
 from gcc_pipe.config import DATA_PATH
-from gcc_pipe.utils.exceptions import PersistFileError
+from gcc_pipe.core.exceptions import PersistFileError
 
 # --- Constantes de modulo --- #
 
@@ -15,7 +15,9 @@ CHECKPOINTS_DIR = DATA_PATH / "checkpoints"
 
 STAGES = (
     'raw', 
-    'transformed', 
+    'transformed',
+    'ref',
+    'quarantine', 
 )
 
 def checkpoint_path(
@@ -27,7 +29,7 @@ def checkpoint_path(
     if stage not in STAGES:
         raise ValueError(f'Etapa invalida: {stage}. Validas: {", ".join(STAGES)}')
 
-    return base_dir.joinpath(pipeline, run_date.isoformat(), f"{stage}.parquet")
+    return base_dir.joinpath(pipeline, run_date.isoformat(), stage ,f"{stage}.parquet")
 
 def write_checkpoint(
     df:pd.DataFrame, 
