@@ -9,6 +9,7 @@ from gcc_pipe.core.schemas import LineageSchema
 
 CATALOGO_ID = ['CC','CE','NIT','RC','PA','TI','NUI']
 VALIDACION_NUMEROS = r"^-?\d+(\.\d+)?$"
+VALIDACION_DIGITOS= r'^\d+$'
 VALIDACION_FECHA = r"^\d{4}-\d{2}-\d{2} 00:00:00$"
 PROCESOS_ORIGEN = ['Activos','Inactivos','Retencion','Creditos']
 
@@ -26,13 +27,21 @@ class AcrRawSchema(LineageSchema):
     cedula: Series[str] = pa.Field(
         alias='Cedula',
         nullable=False,
-        str_length={"max_value": 17}
+        str_length={"max_value": 17},
+        str_matches=VALIDACION_DIGITOS
     )
     
     fecha_aplicacion: Series[str] = pa.Field(
         alias='Fecha_Aplicacion', 
         nullable=False,
         str_matches=VALIDACION_FECHA
+    )
+    
+    fact_pagare: Series[str] = pa.Field(
+        alias='Pagare',
+        nullable=False,
+        str_length={"max_value": 15},
+        str_matches=VALIDACION_DIGITOS
     )
     
     monto_aportes: Series[str] = pa.Field(
@@ -72,7 +81,7 @@ class AcrRawSchema(LineageSchema):
     class Config:
         strict = True
         unique = [['Fecha_Aplicacion' , 'Tipo_Documento', 
-                  'Cedula', 'Tipo_Alternativa']]
+                    'Pagare','Cedula', 'Tipo_Alternativa']]
         
 # --- Esquema de salida --- #
 
@@ -97,6 +106,13 @@ class AcrTargetSchema(LineageSchema):
         nullable=False,
         le=99999999999999999,
         gt=0
+    )
+    
+    fact_pagare: Series[int] = pa.Field(
+        alias='FACT_PAGARE',
+        nullable=False,
+        ge=0,
+        le=999999999999999
     )
     
     fecha_aplicacion: Series[pd.Timestamp] = pa.Field(
@@ -182,6 +198,6 @@ class AcrTargetSchema(LineageSchema):
         strict=True
         unique=[[
             'PERIODO', 'GCC_TIPO_ALFABETICO', 
-            'ASO_IDENTIFICACION', 'FECHA_APLICACION',
-            'ALTERNATIVA'
+            'ASO_IDENTIFICACION', 'FACT_PAGARE',
+            'FECHA_APLICACION', 'ALTERNATIVA'
         ]]

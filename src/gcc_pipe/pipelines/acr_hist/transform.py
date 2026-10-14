@@ -11,6 +11,7 @@ from gcc_pipe.core.exceptions import TransformError
 COL_NAMES = {
     'Tipo_Documento':'GCC_TIPO_ALFABETICO', 
     'Cedula': 'ASO_IDENTIFICACION', 
+    'Pagare': 'FACT_PAGARE',
     'Fecha_Aplicacion': 'FECHA_APLICACION',
     'Monto_Aportes': 'APLICADO_APORTES',
     'Monto_Calamidad': 'APLICADO_CALAMIDAD', 
@@ -22,6 +23,7 @@ COL_NAMES = {
 COL_TYPES = {
     'Tipo_Documento':str, 
     'Cedula': int, 
+    'Pagare': int,
     'Fecha_Aplicacion': date, 
     'Monto_Aportes':'Int64',
     'Monto_Calamidad':'Int64',
@@ -40,7 +42,7 @@ ORIGENES_NO_COMUNES = ['Activos', 'Inactivos']
 
 COLUMNAS_FINALES = [
     'PERIODO', 'GCC_TIPO_ALFABETICO', 'ASO_IDENTIFICACION',
-    'FECHA_APLICACION', 'APLICADO_APORTES', 'APLICADO_CALAMIDAD', 
+    'FACT_PAGARE', 'FECHA_APLICACION', 'APLICADO_APORTES', 'APLICADO_CALAMIDAD', 
     'APLICADO_RECREACION', 'TOTAL_PAGADO_COOMEVA', 'PROCESO_ORIGEN',
     'ALTERNATIVA', 'INDICADOR_CRUZE_INAC_ACT',
 ]
