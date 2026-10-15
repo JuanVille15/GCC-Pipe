@@ -26,17 +26,13 @@ def discover_files(
         raise ExtractError(f'No existe la carpeta base: {base_path}')
     
     # --- Se crean sub_paths --- #
-    rutas = [
-        base_path / sp for sp in sub_paths
-    ]
-    
     faltantes = [
-        f for f in rutas
-        if not f.is_dir()
+        sp for sp in sub_paths
+        if not (base_path / sp).is_dir()
     ]
     
     if faltantes:
-        raise ExtractError(f'No existen las sub-carpetas: {", ".join(f.name for f in faltantes)}')
+        raise ExtractError(f'No existen las sub-carpetas: {", ".join(faltantes)}')
     
     # --- Buscar archivos por pattern --- #
     
@@ -53,7 +49,16 @@ def discover_files(
             modified_at = datetime.fromtimestamp(stat.st_mtime)
             source_file = SourceFile(path=f, sub_path=sub, size_bytes=size_bytes, modified_at=modified_at)
             files.append(source_file)
-
+        
+    # --- Vamos a dejar solo el ultimo archivo de cada subpath --- #
+    ultimos = {}
+    for file in files:
+        actual = ultimos.get(file.sub_path)
+        if actual is None or file.modified_at > actual.modified_at:
+            ultimos[file.sub_path] = file
+    
+    files = list(ultimos.values())
+    
     if not files:
         raise ExtractError(f'No se encontraron archivos: {pattern} en {base_path}')
     
