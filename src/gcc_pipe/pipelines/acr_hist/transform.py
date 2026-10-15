@@ -121,7 +121,10 @@ def _asegurar_tipo_documento(
             right=ref
             .assign(
                 ASO_IDENTIFICACION = lambda d:
-                    d['ASO_IDENTIFICACION'].astype(int)
+                    d['ASO_IDENTIFICACION'].astype(int),
+        
+                GCC_TIPO_ALFABETICO = lambda d:
+                    d['GCC_TIPO_ALFABETICO'].str.strip() # Se realiza porque GCC devuelve tipo doc con espacios #
             )
             .rename(
                 columns={
