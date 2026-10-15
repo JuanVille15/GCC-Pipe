@@ -1,7 +1,7 @@
 import os
 import argparse
 import pandas as pd
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 from dotenv import load_dotenv
 from gcc_pipe.config import load_pipeline_config, get_db_settings
@@ -17,6 +17,28 @@ from pandera.errors import SchemaErrors
 
 ETLS = ['acr_hist']
 KIND = ['hist','month']
+MESES = list(range(1,13))
+
+def validar_periodo(texto:str) -> str:
+    
+    # --- constantes --- #
+    largo = len(texto)
+    es_digito = texto.isdigit()
+     
+    # --- Validaciones --- #
+    
+    if largo != 6 or not es_digito:
+        raise argparse.ArgumentTypeError(f"{texto} no es un periodo valido (YYYYMM, mes 01-12)")
+    
+    mes = int(texto[4:])
+    
+    if mes not in MESES:
+        raise argparse.ArgumentTypeError(f"{texto} no es un periodo valido (YYYYMM, mes 01-12)")
+
+    return texto
+
+def periodo_anterior(hoy:date) -> str:
+    return (hoy.replace(day=1) - timedelta(days=1)).strftime('%Y%m')
 
 
 def main() -> int:
@@ -45,15 +67,33 @@ def main() -> int:
         choices=KIND, 
         default='month', 
         help='Modo de ejecucion del programa --- Diario o Historico'
-    )    
+    )
     
-    args = parser.parse_args()    
+    p_extract.add_argument(
+        '--periodo',
+        type=validar_periodo,
+        default=None,
+        help='Periodo YYYYMM a cargar (solo month). Por defecto el mes anterior',
+    )
     
+    args = parser.parse_args()
+    
+    # --- resolver periodo --- #
+    
+    kind = args.kind
+    periodo = args.periodo
+    
+    if kind == 'hist':
+        if periodo:
+            raise ValueError('Argumento --Periodo solo aplica a --kind month')
+    elif periodo is None:
+        periodo = periodo_anterior(date.today())
+        
     # --- Preparamos --- #
     load_dotenv()
     cfg = load_pipeline_config(process=args.proceso,env=os.environ)
     engine = build_gcc_con(get_db_settings(os.environ))
-    pipeline = build(cfg=cfg, engine=engine, kind=args.kind)
+    pipeline = build(cfg=cfg, engine=engine, periodo=periodo, kind=args.kind)
     run_date = date.today()
     extracted_at = datetime.now()
     
@@ -146,6 +186,14 @@ def main() -> int:
         print(f'Archivo de fallas exportado en: {ruta_fallas}')
         return 1
     
+    # --- Validacion de periodo --- #
+    periodos = validos['PERIODO'].unique().tolist()
+    if kind == 'month':
+        if set(periodos) != {int(periodo)}:
+            print(f'Se requiere carga {periodo} y se obtuvo {periodos}'
+                  f'\n{validos.groupby(['_source_file','PERIODO']).size().to_string()}')
+            return 1
+
     # --- Sino falla se exporta el .parquet en transformed --- #
     path_t = write_checkpoint(validos, pipeline.name, run_date, 'transformed')
     size = len(validos)
@@ -159,7 +207,7 @@ def main() -> int:
     
     ruta_fallas = checkpoint_path(pipeline.name, run_date, 'transformed').parent / "target_failures.csv"
     ruta_fallas.unlink(missing_ok=True)
-    
+           
     # ===============
     # CARGA - GCC
     # ===============

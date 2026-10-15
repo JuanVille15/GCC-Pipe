@@ -2,7 +2,7 @@ source:
   type: excel
   path: ${ACR_HIST_ORIGIN}
   sub_paths: 
-    month: ['Activos','Inactivos']
+    month: ['Activos','Inactivos','Creditos','Retencion']
     hist: ['Activos/Historico', 'Inactivos/Historico','Creditos/Historico','Retencion/Historico']
 
 target:
