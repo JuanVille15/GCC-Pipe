@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 
+from pathlib import Path
 from gcc_pipe.core.exceptions import QueryError
 from sqlalchemy import Engine, create_engine, Connection, text, bindparam
 from sqlalchemy.engine import URL
@@ -18,7 +19,7 @@ def build_gcc_con(config:dict[str,str]) -> Engine:
             query={"service_name": config['SERVICE_GCC']},
         )
 
-    con_gcc = create_engine(url=c_url)
+    con_gcc = create_engine(url=c_url, hide_parameters=True) # raise erros without values...
     
     return con_gcc
 
@@ -54,7 +55,31 @@ def read_batch(
         except Exception as e:
             raise QueryError(f'Error consultando lote {i} - {e}') from e
 
-    return pd.concat(results, axis=0, ignore_index=True)
+    df = pd.concat(results, axis=0, ignore_index=True)
+    df.columns = df.columns.str.upper() # Esto se hace porque SQLAlchemy pone los nombres en minusculas
+    
+    return df
+
+def leer_sql(ruta: Path) -> str:
+    
+    if not ruta.is_file():
+        raise FileNotFoundError(f'La consulta {ruta.name} no fue encontrada en {ruta}')
+    
+    query = ruta.read_text(encoding='utf-8').strip()
+    
+    query = query.removesuffix(';').strip()
+
+    if not query:
+        raise QueryError(f'La sentencia {ruta.name} se encuentra vacia')
+   
+    return query
+
+def extraer_binds(sql:str) -> list[str]:
+    
+    params = text(sql).compile().params
+
+    return list(params)
+
 
 if __name__ == '__main__':
     

@@ -20,3 +20,9 @@ class TransformError(Exception):
 
 class QueryError(Exception):
     pass
+
+class MissingParamError(Exception):
+    pass
+
+class LoadError(Exception):
+    pass

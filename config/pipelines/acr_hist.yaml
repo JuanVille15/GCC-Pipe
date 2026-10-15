@@ -6,6 +6,10 @@ source:
     hist: ['Activos/Historico', 'Inactivos/Historico','Creditos/Historico','Retencion/Historico']
 
 target:
-  schema: GRC
-  table: GCC_HIST_ALTERNATIVAS
-  mode: append
+  pasos:
+    - nombre: borrar_particiones
+      sql: load/acr_hist/delete_particiones.sql
+      modo: por_grupo
+    - nombre: insertar
+      sql: load/acr_hist/insert.sql
+      modo: por_fila

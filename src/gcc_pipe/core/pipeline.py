@@ -3,7 +3,7 @@
 import pandera.pandas as pa
 
 from dataclasses import dataclass
-from gcc_pipe.core.contracts import Extractor
+from gcc_pipe.core.contracts import Extractor, Loader
 
 @dataclass(frozen=True)
 class Pipeline:
@@ -11,3 +11,4 @@ class Pipeline:
     extractor:Extractor
     raw_schema: type[pa.DataFrameModel]
     target_schema: type[pa.DataFrameModel]
+    loader: Loader

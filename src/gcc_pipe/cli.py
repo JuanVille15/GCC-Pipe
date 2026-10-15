@@ -8,7 +8,7 @@ from gcc_pipe.config import load_pipeline_config, get_db_settings
 from gcc_pipe.core.checkpoints import write_checkpoint, checkpoint_path
 from gcc_pipe.pipelines.acr_hist.pipeline import build
 from gcc_pipe.pipelines.acr_hist.transform import transform
-from gcc_pipe.core.exceptions import ExtractError
+from gcc_pipe.core.exceptions import ExtractError, LoadError
 from gcc_pipe.references.asociados import consulta_tipo_documento
 from gcc_pipe.core.db import build_gcc_con
 from gcc_pipe.core.validation import resumir_fallas
@@ -52,8 +52,8 @@ def main() -> int:
     # --- Preparamos --- #
     load_dotenv()
     cfg = load_pipeline_config(process=args.proceso,env=os.environ)
-    pipeline = build(cfg=cfg, kind=args.kind)
     engine = build_gcc_con(get_db_settings(os.environ))
+    pipeline = build(cfg=cfg, engine=engine, kind=args.kind)
     run_date = date.today()
     extracted_at = datetime.now()
     
@@ -85,7 +85,8 @@ def main() -> int:
         estructura = fallas_raw.estructura
         filas = fallas_raw.filas
         if not estructura.empty:
-            print(f'La estructura de origen cambio: {estructura.to_string()}')
+            print('La estructura de origen cambio...'
+                  f'\n{estructura.to_string()}')
         
         print('Se obtuvieron Fallos por regla...'
               f'\n{filas.groupby(['column','check'])['index'].nunique().to_string()}')
@@ -129,7 +130,8 @@ def main() -> int:
         estructura_t = resumen.estructura
         filas_t = resumen.filas
         if not estructura_t.empty:
-            print(f'Estructura de salida incorrecta: {estructura_t[['column','check','failure_case']].to_string()}')
+            print('Estructura de salida incorrecta...'
+                  f'\n{estructura_t[['column','check','failure_case']].to_string()}')
 
         print('Se obtuvieron los siguientes fallos por regla'
               f'\n{filas_t.groupby(['check'])['index'].nunique().to_string()}')
@@ -158,5 +160,32 @@ def main() -> int:
     ruta_fallas = checkpoint_path(pipeline.name, run_date, 'transformed').parent / "target_failures.csv"
     ruta_fallas.unlink(missing_ok=True)
     
+    # ===============
+    # CARGA - GCC
+    # ===============
+    
+    loaded_at = datetime.now()    
+    try:
+        resultado = pipeline.loader.load(validos, loaded_at)
+    except LoadError as e:
+        e.add_note(f'Pipeline {pipeline.name}');raise
+        
+    ultimo_paso = list(resultado.filas_por_paso)[-1]
+    enviadas = len(validos)
+    insertadas = resultado.filas_por_paso[ultimo_paso]
+    diferencia = insertadas - enviadas
+    print('-Filas por paso', resultado.filas_por_paso)
+    print('-Fechas de insercion', resultado.fecha_insercion)
+    
+    if diferencia != 0:
+        print(f'DESCUADRE EN LA CARGA - {pipeline.name} (corrida {run_date})'
+              f'\nFilas enviadas:   {enviadas}'
+              f'\nFilas cargadas:   {insertadas}'
+              f'\nDiferencia:       {diferencia}')
+
+        print('La transaccion ya hizo commit: estos datos ya estan en la tabla.'
+              f'\nFirma de la carga: FECHA_INSERCION = {loaded_at.isoformat(sep=' ')}')
+        return 1
+        
     return 0
     
