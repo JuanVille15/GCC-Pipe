@@ -68,8 +68,8 @@ def _asegurar_tipos(
         if tipo in [int,'Int64']:
             try:
                 convertidas[column] = (
-                    pd.to_numeric(df[column], errors='raise')
-                ).astype(tipo)
+                    pd.to_numeric(df[column], errors='raise') #type-error: safe-cast Numpy
+                ).round().astype(tipo)
             except ValueError as e:
                 errors.append((column,e))
         elif tipo == date:
